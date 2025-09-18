@@ -143,6 +143,37 @@ def get_folder_id(mailbox, folder_id_filter, access_token):
 
     return folder_id
 
+def get_child_folders(mailbox, main_folder_id, access_token):
+    """
+    Retrieves all child folders from a specified mailbox and folder and returns them as a dictionary.
+
+    :param mailbox: The email address of the mailbox to query
+    :param main_folder_id: The parent folder id to query
+    :param access_token: Bearer token for Microsoft Graph API authentication
+    :return: Dictionary with child folder display names as keys and child folder IDs as values
+    """
+
+    # Graph API endpoint for mailbox folders
+    url = f"https://graph.microsoft.com/v1.0/users/{mailbox}/mailFolders/{main_folder_id}/childFolders"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+
+    data = response.json()
+
+    # Validate that we found matching folders
+    if not data.get('value') or len(data['value']) == 0:
+        raise ValueError(f"No child folders found matching under folder id: {main_folder_id}.")
+
+    child_folders = {folder['displayName']: folder['id'] for folder in data.get('value', [])}
+
+    return child_folders
+
 
 def get_messages(mailbox, folder_id, access_token, filter_query=None, top=100):
     """
