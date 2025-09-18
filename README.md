@@ -93,6 +93,16 @@ Retrieves a specific folder ID using OData filter query.
 
 **Returns:** Folder ID string
 
+#### `get_child_folders(mailbox, main_folder_id, access_token)`
+Retrieves all child folders from a specified parent folder and returns them as a dictionary.
+
+**Parameters:**
+- `mailbox` (str): Email address of the target mailbox
+- `main_folder_id` (str): The parent folder ID to query for child folders
+- `access_token` (str): Bearer token for authentication
+
+**Returns:** Dictionary with child folder display names as keys and child folder IDs as values
+
 ### Message Operations
 
 #### `get_messages(mailbox, folder_id, access_token, filter_query=None, top=100)`
@@ -162,6 +172,18 @@ Retrieves attachment metadata and binary content.
 # Search for messages from a specific sender
 filter_query = "from/emailAddress/address eq 'sender@example.com'"
 messages = get_messages("user@example.com", folder_id, token, filter_query=filter_query)
+```
+
+### Working with Child Folders
+```python
+# Get child folders from a parent folder
+parent_folder_id = folders["Archive"]
+child_folders = get_child_folders("user@example.com", parent_folder_id, token)
+print(f"Child folders: {list(child_folders.keys())}")
+
+# Access messages from a child folder
+if "2024" in child_folders:
+    messages_2024 = get_messages("user@example.com", child_folders["2024"], token)
 ```
 
 ### Download Attachments
@@ -236,6 +258,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Check the [Microsoft Graph API documentation](https://docs.microsoft.com/en-us/graph/api/overview) for API reference
 
 ## Changelog
+
+### v1.1.0
+- Added `get_child_folders()` function for hierarchical folder navigation
+- Enhanced folder management capabilities for complex mailbox structures
 
 ### v1.0.0
 - Initial release with complete mailbox access functionality
